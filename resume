@@ -1,0 +1,13 @@
+use npm run dev to run application
+to use link in route you have to import them
+in route we can use link with to or a with href
+axios use it to link front with back api endpoint
+remember: i change the path in server from student to /
+until now i dont use navigate 
+axios and coes are the thing that link back and front the should have a cridential : true for cookies and http
+ant design is a good library for react
+implement toast
+the user in the get profile refer to the name of it in the state in front
+the dependency array in useeffect hook is to ensure that the useeefect run whenever the user or any element u send in dep array state changes
+in the app we import the function of usercontextprovider
+in the private page we import userContext const

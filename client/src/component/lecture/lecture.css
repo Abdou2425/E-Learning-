@@ -1,0 +1,14 @@
+.f-container{
+    padding: 0;
+}
+.line{
+    margin: 0;
+}
+.f-col{
+background-color: #f8f9fa;
+padding: 20px
+}
+.s-col{
+    background-color:  #f2f8f9;
+    padding: 20px 
+}

@@ -15,6 +15,7 @@ const {hashPassword, comparePassword} = require(`../helpers/auth`)
 
 const studentProfile = async (req, res) => {
     const token = req.cookies.token
+    if(token){
     const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
 
     try {
@@ -35,6 +36,7 @@ const studentProfile = async (req, res) => {
             err: `Failed to get the student profile from the database`
         })
     }
+}
 }
 
 //change student name
@@ -188,5 +190,94 @@ const updatePassword = async (req, res) => {
         })        
     }
 }
+const updateInfo = async (req, res) => {
+    try{
+        const token = req.cookies.token
+        const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
 
-module.exports = {studentProfile, updateName, updatePassword}
+        const {newName, oldPass, newPass} = req.body
+        if(!newName && !oldPass && !newPass) {
+            console.log('no changes have been done');
+            return res.status(200).status({
+                msg: `no changes have been done`
+            })
+        }
+
+        const theStudent = await student.findOne({_id: decoded.studentId})
+
+        if(newName){
+            if(!isOnlyString(newName)){
+                console.log('New Name is required, only characters are allowed');
+                return res.status(400).json({
+                    err: 'New Name is required, only characters are allowed'
+                })
+            }
+
+            if(theStudent.name === newName){
+                console.log('New Name cannot be the same as the old one');
+                return res.status(400).json({
+                    err: `New Name cannot be the same as the old one`
+                })
+            }
+
+            await student.updateOne(
+                {_id: decoded.studentId},
+                {name : newName}
+            )
+            
+            console.log("student's name updated successfully");
+        }
+
+        if(oldPass && newPass){
+            if(oldPass.length < 8 || oldPass.length > 32){
+                console.log('pls enter the old Password first');
+                return res.status(400).json({
+                    err: `please enter the old Password first`
+                })
+            }
+
+            if(newPass.length < 8 || newPass.length > 32){
+                console.log('new password must be between 8 and 32 characters');
+                return res.status(400).json({
+                    err: `new password must be between 8 and 32 characters`
+                })
+            }
+
+            if(oldPass === newPass){
+                console.log('new Password cannot be the same as the old one');
+                return res.status(400).json({
+                    err: 'New Password cannot be the same as the old one'
+                })
+            }
+
+            const match = await comparePassword(oldPass, theStudent.password)
+            if(match){
+                const hashedNewPass = await hashPassword(newPass)
+    
+                await student.updateOne(
+                    {_id: decoded.studentId},
+                    {password: hashedNewPass}
+                )
+    
+                console.log("student's password updated successfully");
+            }else{
+                console.log('Wrong Old Password');
+                return res.status(401).json({
+                    err: `Wrong Old password`
+                })
+            }
+        }
+
+        return res.status(200).json({
+            msg: `all infos updated successfully`
+        })
+    }
+    catch(error){
+        console.log(error.message);
+        return res.status(500).json({
+            err: `Error while trying to update student's info`
+        })
+    }
+}
+
+module.exports = {studentProfile, updateName, updatePassword,updateInfo}

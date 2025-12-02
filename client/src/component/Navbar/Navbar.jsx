@@ -30,7 +30,7 @@ export function Navbar(){
 </div>
           <ul className="navbar-nav">
             <li className="nav-item">
-              <a className="nav-link active" aria-current="page" href="/">Home</a>
+              <a className="nav-link active" aria-current="page" href="/" style={{color:"#000957",fontSize:"21px"}}>Home</a>
             </li>
             <li className="nav-item">
               <a className="nav-link" href="/courses">courses</a>
@@ -38,9 +38,7 @@ export function Navbar(){
             <li className="nav-item">
               <a className="nav-link" href="/profiles">profile</a>
             </li>
-            <li className="nav-item">
-              <a className="nav-link" href="/about">About</a>
-            </li>
+            
           </ul>
         </div>
       </div>

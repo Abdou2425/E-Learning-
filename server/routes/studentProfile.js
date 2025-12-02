@@ -3,7 +3,7 @@ const router = express.Router()
 const cors = require("cors")
 
 //import end-points
-const {studentProfile, updateName, updatePassword} = require(`../controllers/studentProfile`)
+const {studentProfile, updateName, updatePassword,updateInfo} = require(`../controllers/studentProfile`)
 
 //midleware
 router.use(
@@ -17,9 +17,6 @@ router.use(
 router.get(`/profile`, studentProfile)
 
 //update student infos
-router.put(`/profile/updateName`, updateName)
-
-//passsword update
-router.put(`/profile/updatePassword`, updatePassword)
+router.put(`/profile/updateInfo`, updateInfo)
 
 module.exports = router

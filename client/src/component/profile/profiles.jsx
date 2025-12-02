@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useContext } from "react";
 import studentP from "../../assets/student.png";
 import teacherP from "../../assets/teacher.png";
@@ -10,16 +10,43 @@ import axios, { Axios } from "axios";
 import { toast } from "react-toastify";
 import "./profiles.css";
 import Modal from "react-modal";
+//course form
+import { CourseP } from "./courseForm";
+import { CourseS } from "./courseSform";
+//warning
+import { Warning } from "../warning/warning";
 export function Profiles() {
+  //course
+  const [courses, setcourses] = useState("");
+  const [coursesS, setcoursesS] = useState("");
   const [visibleC, setvisibleC] = useState(false);
   const [visible, setvisible] = useState(false);
   const { student } = useContext(userContext);
-  const{ teacher }=useContext(teacherContext)
-  console.log(teacher)
-  console.log(student)
+  const { teacher } = useContext(teacherContext);
+  console.log(teacher);
+  console.log(student);
   const [loading, setLoading] = useState(true);
   const [userType, setUserType] = useState(null);
   useEffect(() => {
+    // all courses prof
+    async function getCourses() {
+      try {
+        const { data } = await axios.get(`courses/allProfessorCourses`);
+        setcourses(data);
+      } catch (error) {
+        console.error("Error fetching lectures:", error);
+      }
+    }
+    async function getStudentCourses() {
+      try {
+        const { data } = await axios.get(`courses/enrollments/enrolledCourses`);
+        setcoursesS(data);
+      } catch (error) {
+        console.error("Error fetching lectures:", error);
+      }
+    }
+    getCourses();
+    getStudentCourses()
     // Simulate async data fetch from localStorage
     const type = localStorage.getItem("user_type");
     setUserType(type); // Set userType from localStorage
@@ -41,16 +68,13 @@ export function Profiles() {
   async function editprofile(e) {
     e.preventDefault();
     const { newName, oldPass, newPass } = userdata;
-    if (!oldPass && !newPass && !newName) {
-      toast.warning("you must fill what you wana edit");
-    } else if (!oldPass && !newPass) {
       try {
-        const { data } = await axios.put( `${userType}/profile/updateName`, {
-          newName,
+        const { data } = await axios.put(`${userType}/profile/updateInfo`, {
+          newName,oldPass,newPass,
         });
         toast.success(data.msg);
         console.log(data);
-        setuserdata({ newName: "" });
+        setuserdata({ newName: "",oldPass:"",newPass:"" });
       } catch (error) {
         if (error.response) {
           // The request was made and the server responded with a status code
@@ -59,65 +83,36 @@ export function Profiles() {
           console.log(error.response);
         }
         console.log(error);
-        setuserdata({ newName: "", oldPass: "", newPass: "" });
       }
-    } else if (!newName) {
-      try {
-        const { data } = await axios.put(`${userType}/profile/updatePassword`, {
-          oldPass,
-          newPass,
-        });
-        toast.success(data.msg);
-        console.log(data);
-        setuserdata({ oldPass: "", newPass: "" });
-      } catch (error) {
-        if (error.response) {
-          // The request was made and the server responded with a status code
-          // that falls out of the range of 2xx
-          console.log(error.response);
-          toast.error(error.response.data.err);
-        }
-        console.log(error);
-        setuserdata({ newName: "", oldPass: "", newPass: "" });
-      }
-    } else {
-      toast.warning(
-        "you cant edit all of them at same time choose one then the other"
-      );
       setuserdata({ newName: "", oldPass: "", newPass: "" });
-    }
   }
   // this for add course
   async function addcourse(e) {
     e.preventDefault();
     const { title, target, key, info, image } = coursedata;
-    console.log(coursedata)
+    console.log(coursedata);
     try {
       const formData = new FormData();
-    formData.append('title', title);
-    coursedata.target.forEach((item, index) => {
-      formData.append(`target[${index}]`, item); // Send array in a format compatible with many backends
-    });
-    formData.append('key', key);
-    formData.append('info', info);
+      formData.append("title", title);
+      coursedata.target.forEach((item, index) => {
+        formData.append(`target[${index}]`, item); // Send array in a format compatible with many backends
+      });
+      formData.append("key", key);
+      formData.append("info", info);
 
-    if (image) {
-      formData.append('image', image); // Append the image file
-    }
+      if (image) {
+        formData.append("image", image); // Append the image file
+      }
 
-    // Make POST request with FormData
-    const { data } = await axios.post("courses/new", formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data', // Set the appropriate header for file uploads
-      },
-    });
+      // Make POST request with FormData
+      const { data } = await axios.post("courses/newCourse", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data", // Set the appropriate header for file uploads
+        },
+      });
       toast.success(data.msg);
       console.log(data);
-      setcoursedata({title: "",
-        target: "",
-        key: "",
-        info: "",
-        image: null})
+      setcoursedata({ title: "", target: "", key: "", info: "", image: null });
     } catch (error) {
       if (error.response) {
         // The request was made and the server responded with a status code
@@ -131,21 +126,53 @@ export function Profiles() {
       });
     }
   }
+  //logout
+  const handleLogoutP = async (e) => {
+    e.preventDefault()
+    
+      try {
+        const {data} = await axios.post("professor/logout",{},{withCredentials: true});
+        toast.success(data.msg)
+      } catch (error) {
+        toast.error(error.response.data.err);
+        console.error("Error during logout:", error);
+      }
+  };
+  const handleLogoutS = async (e) => {
+    e.preventDefault()
+    
+      try {
+        const {data} = await axios.post("student/logout",{},{withCredentials: true});
+        toast.success(data.msg)
+      } catch (error) {
+        toast.error(error.response.data.err);
+        console.error("Error during logout:", error);
+      }
+  };
+
   if (!student && !teacher) {
     return (
-      <>
-        <h3 style={{ color: "#000" }}>you cant access here</h3>
-      </>
+      <Warning>
+      </Warning>
     );
   }
-  
   if (!userType) {
     return (
       <>
-        <h3 style={{ color: "#000" }}>Please sign in again</h3>
+        <h3 style={{ color: "#000",textAlign:"center",fontFamily:"cursive" }}>Please sign in again</h3>
       </>
     );
   }
+  if (loading) {
+    // Render a loading spinner or message while waiting
+    return <div>Loading...</div>;
+  }
+  console.log(student);
+  console.log(teacher);
+  console.log(userType);
+  console.log(courses);
+  console.log("ggg"+coursesS);
+
 
   return (
     <>
@@ -181,69 +208,110 @@ export function Profiles() {
                   </div>
                   <div class="ms-3" style={{ marginTop: "130px" }}>
                     <h5>
-                      {userType==="professor" ? (teacher.name.charAt(0).toUpperCase() + teacher.name.slice(1)) : (student.name.charAt(0).toUpperCase() + student.name.slice(1))}
+                      {userType === "professor" && teacher
+                        ? teacher.name.charAt(0).toUpperCase() +
+                          teacher.name.slice(1)
+                        : student &&
+                          student.name.charAt(0).toUpperCase() +
+                            student.name.slice(1)}
                     </h5>
                     <p style={{ textAlign: "left", fontSize: "20px" }}>
                       {userType === "professor" ? "Teacher" : "Student"}
                     </p>
                   </div>
                 </div>
-                <div class="p-4 text-black bg-body-tertiary">
+                <div class="p-4 text-black bg-body-tertiary" style={{paddingBottom:"0px"}}>
                   <div class="d-flex justify-content-end text-center py-1 text-body">
-                    <div>
-                      <p class="mb-1 h5">253</p>
-                      <p class="small text-muted mb-0">Photos</p>
-                    </div>
-                    <div class="px-3">
-                      <p class="mb-1 h5">1026</p>
-                      <p class="small text-muted mb-0">Followers</p>
-                    </div>
-                    <div>
-                      <p class="mb-1 h5">478</p>
-                      <p class="small text-muted mb-0">Following</p>
-                    </div>
+                    { teacher &&
+                   <form onSubmit={handleLogoutP}>
+                  <button
+                          type="submit"
+                          data-mdb-button-init
+                          data-mdb-ripple-init
+                          className="btn btn-info text-body"
+                          data-mdb-ripple-color="dark"
+                          style={{ zIndex: 1,width:"200px",height:"50px",fontSize:"22px" }}
+                          
+                        >
+                          Log OutP
+                        </button>
+                        </form>
+                        }
+                        {student && 
+                         <form onSubmit={handleLogoutS}>
+                         <button
+                                 type="submit"
+                                 data-mdb-button-init
+                                 data-mdb-ripple-init
+                                 className="btn btn-info text-body"
+                                 data-mdb-ripple-color="dark"
+                                 style={{ zIndex: 1,width:"200px",height:"50px",fontSize:"22px" }}
+                                 
+                               >
+                                 Log OutS
+                               </button>
+                               </form>
+                        }
                   </div>
                 </div>
                 <div class="card-body p-4 text-black">
                   <div class="mb-4  text-body">
-                    <p class="lead fw-normal mb-1">Information</p>
-                    <div className="p-4 bg-body-tertiary">
-                      <div className="row mb-2">
+                    <p class="lead fw-normal mb-1" style={{fontFamily:"monospace"}}>Information</p>
+                    <div className="p-4 bg-body-tertiary" style={{paddingTop:"0px"}}>
+                      <div className="row mb-2" style={{marginTop:"0px"}}>
                         <div className="col-4 text-start fw-bold border-end">
                           Email
                         </div>
-                        <div className="col-8 text-start">{userType==="professor" ? teacher.email : student.email}</div>
+                        <div className="col-8 text-start">
+                          {" "}
+                          {userType === "professor" && teacher
+                            ? teacher.email
+                            : student && student.email}
+                        </div>
                       </div>
                       <div className="row mb-2">
                         <div className="col-4 text-start fw-bold border-end">
                           Name
                         </div>
-                        <div className="col-8 text-start">{userType==="professor" ? teacher.name : student.name}</div>
+                        <div className="col-8 text-start">
+                          {" "}
+                          {userType === "professor" && teacher
+                            ? teacher.name
+                            : student && student.name}
+                        </div>
                       </div>
                       <div className="row mb-2">
                         <div className="col-4 text-start fw-bold border-end">
-                         {userType==="professor" ? "Domaine" : "univId"} 
+                          {userType === "professor" ? "Domaine" : "univId"}
                         </div>
                         <div className="col-8 text-start">
                           {/* {user.domaine.join(", ")} */}
-                          {userType==="professor" ? teacher.domaine.join(", ") : student.univId}
+                          {userType === "professor" && teacher
+                            ? teacher.domaine.join(", ")
+                            : student && student.univId}
                         </div>
                       </div>
                       <div className="row">
                         <div className="col-4 text-start fw-bold border-end">
-                          {userType==="teacher" ? "Grade" : "Year"}
+                          {userType === "teacher" ? "Grade" : "Year"}
                         </div>
-                        <div className="col-8 text-start">{userType==="professor" ? teacher.grade : student.year}</div>
+                        <div className="col-8 text-start">
+                          {" "}
+                          {userType === "professor" && teacher
+                            ? teacher.grade
+                            : student && student.year}
+                        </div>
                       </div>
-                      {userType==="professor" && (
-                         <div className="row">
-                         <div className="col-4 text-start fw-bold border-end">
-                           Adress
-                         </div>
-                         <div className="col-8 text-start">{teacher.address}</div>
-                       </div>
-                      )
-                      }
+                      {userType === "professor" && teacher && (
+                        <div className="row">
+                          <div className="col-4 text-start fw-bold border-end">
+                            Adress
+                          </div>
+                          <div className="col-8 text-start">
+                            {teacher.address || "N/A"}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                   {userType === "professor" && (
@@ -268,10 +336,10 @@ export function Profiles() {
                   )}
 
                   <div class="d-flex justify-content-between align-items-center mb-4 text-body">
-                    <p class="lead fw-normal mb-0">
+                    <p class="lead fw-normal mb-0" style={{fontFamily:"cursive"}}>
                       {userType === "professor"
-                        ? "Created Courses"
-                        : "Enrolle Courses"}
+                        ? "Created Courses :"
+                        : "Enrolle Courses :"}
                     </p>
                     <p class="mb-0">
                       <a href="#!" class="text-muted">
@@ -280,36 +348,16 @@ export function Profiles() {
                     </p>
                   </div>
                   <div class="row g-2">
-                    <div class="col mb-2">
-                      <img
-                        src="https://mdbcdn.b-cdn.net/img/Photos/Lightbox/Original/img%20(112).webp"
-                        alt="image 1"
-                        class="w-100 rounded-3"
-                      />
-                    </div>
-                    <div class="col mb-2">
-                      <img
-                        src="https://mdbcdn.b-cdn.net/img/Photos/Lightbox/Original/img%20(107).webp"
-                        alt="image 1"
-                        class="w-100 rounded-3"
-                      />
-                    </div>
-                  </div>
-                  <div class="row g-2">
-                    <div class="col">
-                      <img
-                        src="https://mdbcdn.b-cdn.net/img/Photos/Lightbox/Original/img%20(108).webp"
-                        alt="image 1"
-                        class="w-100 rounded-3"
-                      />
-                    </div>
-                    <div class="col">
-                      <img
-                        src="https://mdbcdn.b-cdn.net/img/Photos/Lightbox/Original/img%20(114).webp"
-                        alt="image 1"
-                        class="w-100 rounded-3"
-                      />
-                    </div>
+                    
+                    {courses && userType === "professor" && (
+                      courses.map((element) => (
+                        <CourseP key={element._id} course={element} />
+                      )))}
+                      {coursesS && userType==="student" && (
+                        coursesS.map((element) => (
+                          <CourseS key={element._id} course={element} />
+                        ))
+                      )}
                   </div>
                 </div>
               </div>
@@ -356,7 +404,6 @@ export function Profiles() {
                 />
                 <label for="email">Name</label>
               </div>
-              <h5 style={{ marginTop: "5px", marginBottom: "25px" }}>OR</h5>
               <div class="input-field">
                 <input
                   type="password"
@@ -487,11 +534,7 @@ export function Profiles() {
                 <label for="pass">Image</label>
               </div>
               <div class="input-field">
-                <input
-                  type="submit"
-                  class="submit"
-
-                />
+                <input type="submit" class="submit" />
               </div>
             </form>
           </div>

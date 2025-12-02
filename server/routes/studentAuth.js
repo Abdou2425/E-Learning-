@@ -1,31 +1,39 @@
-const express = require(`express`)
-const router = express.Router()
-const cors = require("cors")
+const express = require("express");
+const cors = require("cors");
 
-//import end-points
-const {studentRegister, verifyEmail, verified, studentLogin} = require(`../controllers/studentAuth`)
+const router = express.Router();
 
-//midleware
+// Import Controllers
+const {
+  studentRegister,
+  verifyEmail,
+  verified,
+  studentLogin,
+  studentLogout,
+} = require("../controllers/studentAuth");
+
+// 🛠️ Middleware Configuration
 router.use(
-    cors({
-        credentials:true,
-        origin:"http://localhost:5173"
-    })
-)
+  cors({
+    credentials: true,
+    origin: "http://localhost:5173",
+  })
+);
+router.use(express.json()); // Ensure JSON requests are handled
 
-//register request
-router.post(`/register`, studentRegister)
+// 📝 Auth Routes
+router.post("/register", studentRegister);  // 🟢 Register
+router.post("/login", studentLogin);       // 🟢 Login
+router.post("/logout", studentLogout);     // 🔴 Logout
 
-//verify email
-router.get(`/verify/:studentId/:uniqueString`, verifyEmail)
+// 📩 Email Verification Routes
+router.get("/verify/:studentId/:uniqueString", verifyEmail); // Verify email link
+router.get("/verified", verified);  // Email verification page
 
-//verify
-router.get(`/verified`, verified)
+// ❌ Error Handling Middleware (Optional)
+// router.use((err, req, res, next) => {
+//   console.error(err.stack);
+//   res.status(500).json({ err: "Internal Server Error" });
+// });
 
-//login request
-router.post(`/login`, studentLogin)
-
-//logout request
-
-
-module.exports = router
+module.exports = router;

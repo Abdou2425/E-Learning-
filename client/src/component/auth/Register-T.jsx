@@ -1,6 +1,7 @@
 import React from "react";
 import "./auth.css"
 import cour from "../../assets/register2.png"
+import register from "../../assets/register.png";
 export function RegisterT(){
   return<>
   <div class="wrapper">
@@ -17,7 +18,7 @@ export function RegisterT(){
             <div class="col-md-6 right">
                 
                 <div class="input-box">
-                <img src="./public/register.png" className="register" alt=""/>
+                <img src={register} className="register" alt=""/>
                    <header>Register</header>
                    <div class="input-field">
                         <input type="text" class="input" id="email" required="" autocomplete="off"/>

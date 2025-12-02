@@ -8,6 +8,7 @@ import register from "../../assets/register.png"
 import {  toast } from 'react-toastify';
 import axios from "axios";
 export function Register(){
+    const [loading, setLoading] = useState(false);
     const Navigate=useNavigate()
     const[data,setdata]=useState({
         name:"",
@@ -18,6 +19,7 @@ export function Register(){
     })
     async function registeruser(e){
        e.preventDefault()
+       setLoading(true)
        const{name,email,univId,year,password}=data
         try{
             const {data}=await axios.post("student/register",{
@@ -32,6 +34,7 @@ export function Register(){
                     password:""});
             }else{
                 toast.success(data.msg)
+                setLoading(false)
                setdata({ name:"",
                 email:"",
                 univId:"",
@@ -50,7 +53,9 @@ export function Register(){
                   }
                   console.log(error);
                   setdata({name:"",email:"",univId:"",year:"",password:""});
-        }
+        }finally {
+            setLoading(false); // Stop loading
+          }
     }
   return<>
   <div class="wrapper">
@@ -65,10 +70,11 @@ export function Register(){
                 
             </div>
             <div class="col-md-6 right">
-                
+            
                 <div class="input-box">
                 <img src={register} className="register" alt=""/>
                    <header>Register</header>
+                   {loading && <h6 style={{color:"#000",fontFamily:"cursive"}}>Loading...</h6>}
                    <form onSubmit={registeruser}>
                    <div class="input-field">
                         <input type="text" class="input" id="name" required="" autocomplete="off" value={data.name} onChange={(e)=>{setdata({...data,name:e.target.value})}}/>
@@ -93,9 +99,10 @@ export function Register(){
                   
                    <div class="input-field">
                         
-                        <input type="submit" class="submit" value="Register"/>
+                        <input type="submit" class="submit" value="Register"  disabled={loading}/>
                    </div> 
                    </form>
+                    {loading && <p>Loading...</p>}
                    <div class="signin">
                     <span>Already have an account? <a href="/student/signin">Log in here</a></span>
                    </div>

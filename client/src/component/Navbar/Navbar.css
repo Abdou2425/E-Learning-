@@ -8,13 +8,14 @@
   
   }
   .navbar-nav{
-    margin-left: 6%;
+    margin-left: 9%;
   }
   .navbar-brand{
     margin-left: 5%;
   }
   .nav-item{
     margin: 5%;
+    margin-left: 7%;
   
   }
   .navbar-nav .nav-link:hover  {
@@ -22,6 +23,8 @@
   }
   .nav-link{
     font-size: 1.2rem;
+    font-family:monospace;
+    color: blue;
   }
   .search{
 margin-left: 70px;

@@ -1,0 +1,30 @@
+.hover-style:hover {
+    background-color: #007bff;  /* Blue background on hover */
+    color: #ffffff !important;  /* White text when hovered */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+  .scrollbar {
+    height: 500px;
+    
+    overflow: auto;
+    padding: 0 10px;
+}
+/*       ScrollBar 1        */
+
+#scrollbar1::-webkit-scrollbar {
+    width: 1px;
+}
+
+#scrollbar1::-webkit-scrollbar-track {
+    border-radius: 8px;
+    background-color: #fff;
+    border: 1px solid #cacaca;
+    box-shadow:0 4px 6px rgba(0, 0, 0, 0.1) ;
+}
+
+#scrollbar1::-webkit-scrollbar-thumb {
+    border-radius: 8px;
+    background-color: #08C2FF;
+}
+

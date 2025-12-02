@@ -21,7 +21,7 @@ export function Signin() {
         email,
         password,
       });
-   localStorage.setItem("user_type", "student");
+   localStorage.setItem("user_type", "student");  
       toast.success(data.msg)
       setdata({});
       Navigate("/profiles");

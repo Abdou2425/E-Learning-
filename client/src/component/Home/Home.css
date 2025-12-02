@@ -104,3 +104,14 @@ body{
       text-align: center;
     }
   }
+
+  .p{
+    font-family: 'Source Code Pro', monospace;
+    font-size: 28px;
+    color: rgba(255, 255, 255, 0.888);
+    margin: 0 auto;
+    margin-left: 30px;
+    overflow: hidden; /* Ensures lines animate smoothly */
+  }
+  
+  

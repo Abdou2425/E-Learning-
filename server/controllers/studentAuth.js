@@ -330,8 +330,28 @@ const studentLogin = async (req, res) => {
 }
 
 //lougout endpoint
-const studentLogout = (req, res) => {
+const studentLogout = async (req, res) => {
+    try {
+        // Check if token cookie exists before clearing
+        if (!req.cookies || !req.cookies.token) {
+            return res.status(400).json({ err: 'No active session to log out' });
+        }
 
-}
+        // Clear the token from the cookie
+        res.clearCookie('token', {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production', // Only secure in production
+            sameSite: 'Strict', // Prevent CSRF attacks
+            path: '/', // Ensure cookie is cleared for the whole site
+        });
 
-module.exports = {studentRegister, verifyEmail, verified, studentLogin, studentLogout}
+        console.log('student logged out successfully');
+        return res.status(200).json({ msg: 'Logged out successfully' });
+    } catch (error) {
+        console.error('Logout error:', error.message);
+        return res.status(500).json({ err: 'Error while trying to log out' });
+    }
+};
+
+
+module.exports = {studentRegister, verifyEmail, verified, studentLogin,studentLogout}

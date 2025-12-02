@@ -1,6 +1,7 @@
 import React from "react";
 import "./auth.css";
 import cour from "../../assets/register2.png";
+import register from "../../assets/register.png";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import axios, { Axios } from "axios";
@@ -47,7 +48,7 @@ export function SigninT() {
             </div>
             <div class="col-md-6 right">
               <div class="input-box">
-                <img src="./public/register.png" className="register" alt="" />
+                <img src={register} className="register" alt="" />
                 <header>Sign In</header>
                 <form onSubmit={loginuser}>
                   <div class="input-field">
@@ -81,12 +82,7 @@ export function SigninT() {
                     <input type="submit" class="submit" value="Sign In" />
                   </div>
                 </form>
-                <div class="signin">
-                  <span>
-                    Already have an account?{" "}
-                    <a href="/teacher/register">Register Here</a>
-                  </span>
-                </div>
+                
               </div>
             </div>
           </div>

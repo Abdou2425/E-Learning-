@@ -6,9 +6,15 @@
 }
 .f-col{
 background-color: #f8f9fa;
-padding: 20px
+padding: 20px;
+height: 100%;
 }
 .s-col{
     background-color:  #f2f8f9;
     padding: 20px 
+}
+.fileg{
+    width: 50px;
+    margin-left: 20px;
+    margin-right: 20px;
 }

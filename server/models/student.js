@@ -25,7 +25,12 @@ const studentSchema = new mongoose.Schema({
     verified : {
         type : Boolean,
         default : false
+    }, enrollments: {
+        type: [mongoose.SchemaTypes.ObjectId],
+        ref: `course`,
+        default: []
     }
+
 
 })
 

@@ -15,7 +15,7 @@ require(`dotenv`).config()
 //Professor Registration Endpoint
 const professorRegister = async (req, res) => {
     const {name, email, password, domaine, grade, address} = req.body;
-
+console.log("d5alt")
     //name check
     if(!name) { 
         console.log('Name is required');
@@ -57,6 +57,7 @@ const professorRegister = async (req, res) => {
         try{
             const existingProfessor = await professor.findOne({email});
             if (existingProfessor) {
+                console.log(`Email already exists: ${email}`);
                 console.log('Email is already in use');
                 return res.status(400).json({
                     err: "Email is already in use" 
@@ -226,5 +227,28 @@ const professorLogin = async (req, res) => {
         return res.status(500).json({ err: "An error occurred during login" });
     }
 };
+const professorLogout = async (req, res) => {
+    try {
+        // Check if token cookie exists before clearing
+        if (!req.cookies || !req.cookies.token) {
+            return res.status(400).json({ err: 'No active session to log out' });
+        }
 
-module.exports = { professorRegister, professorLogin };
+        // Clear the token from the cookie
+        res.clearCookie('token', {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production', // Only secure in production
+            sameSite: 'Strict', // Prevent CSRF attacks
+            path: '/', // Ensure cookie is cleared for the whole site
+        });
+
+        console.log('Professor logged out successfully');
+        return res.status(200).json({ msg: 'Logged out successfully' });
+    } catch (error) {
+        console.error('Logout error:', error.message);
+        return res.status(500).json({ err: 'Error while trying to log out' });
+    }
+};
+
+
+module.exports = { professorRegister, professorLogin,professorLogout };
